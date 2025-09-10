@@ -12,3 +12,4 @@ day_counter.txt
 
 # Ignore generated images
 images/
+dataset/

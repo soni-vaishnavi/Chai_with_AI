@@ -1,0 +1,14 @@
+
+main2.py
+learning.ipynb
+
+# Ignore API keys and environment
+.env
+
+# Ignore prompt files and counters
+prompts.txt
+prompt_counter.txt
+day_counter.txt
+
+# Ignore generated images
+images/

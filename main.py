@@ -1,19 +1,18 @@
 import os
 import requests
 import json
-import schedule
 from dotenv import load_dotenv
 
-# --- Step 1: Securely load all API credentials ---
+# Step 1: Securely load all API credentials
 load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 hf_access_token = os.getenv("HF_ACCESS_TOKEN")
 facebook_token = os.getenv("FACEBOOK_ACCESS_TOKEN")
 page_id = os.getenv("FACEBOOK_PAGE_ID")  # Your FB Page ID
 
-print("Starting the automation process...")
+print(" Starting the automation process...")
 
-# --- Step 2: Manage daily counter ---
+# Step 2: Manage daily counter 
 def get_next_day():
     counter_file = "day_counter.txt"
 
@@ -31,7 +30,7 @@ def get_next_day():
 
     return day
 
-# --- Step 3: Load next prompt from prompt bank ---
+# Step 3: Load next prompt from prompt bank 
 def get_next_prompt():
     prompts_file = "prompts.txt"
     counter_file = "prompt_counter.txt"
@@ -39,54 +38,17 @@ def get_next_prompt():
     # Example prompts if prompts.txt doesn’t exist
     if not os.path.exists(prompts_file):
         default_prompts = [
-
-"Explain supervised learning with a real-world example in 100 words",
-            
-"What is underfitting in ML? Explain simply maximum 150 words",
-
-"Explain the difference between classification and regression ",
-
-"What is reinforcement learning? Give a real-world analogy",
-
-"Explain the difference between generative AI and traditional AI in with an easy analogy.",
-
-"What is the Turing Test and does ChatGPT pass it? Explain in a fun way .",
-
-"How does AI detect fake news? Explain simply  with a real-world example.",
-
-"What is a neural network? Explain it like I’m 12 years old ",
-
-"Explain how AI is used in self-driving cars with a simple analogy.",
-
-"What is prompt engineering? Explain with a funny real-life analogy",
-
-"Explain how AI is helping doctors predict diseases before symptoms appear.",
-
-"What is computer vision? Explain with real-life applications.",
-
-"Explain how AI translates languages instantly like Google Translate  .",
-
-"What is bias in AI? Explain with a simple funny example   .",
-
-"How does ChatGPT actually generate answers? Explain simply  with an example.",
-
-"What is reinforcement learning from human feedback (RLHF)? Explain .",
-
-"Explain how AI is being used in Hollywood movies or Netflix recommendations .",
-
-"What is deepfake AI? Explain with a funny but clear example .",
-
-"Explain how AI can create music like a human composer .",
-
-"What is AGI (Artificial General Intelligence)? Explain with a sci-fi twist .",
-
-"Explain how AI helps in fraud detection for banks .",
-
-"What is the difference between machine learning and deep learning? Explain.",
-
-"Explain how AI chatbots are replacing customer service in a fun way .",
-
-"Give 5 surprising and funny facts about AI that most people don’t know."]
+            "Explain supervised learning with a real-world example in 100 words",
+            "What is underfitting in ML? Explain simply maximum 150 words",
+            "Explain the difference between classification and regression",
+            "What is reinforcement learning? Give a real-world analogy",
+            "Explain the difference between generative AI and traditional AI with an easy analogy.",
+            "What is the Turing Test and does ChatGPT pass it? Explain in a fun way.",
+            "How does AI detect fake news? Explain simply with a real-world example.",
+            "What is a neural network? Explain it like I’m 12 years old",
+            "Explain how AI is used in self-driving cars with a simple analogy.",
+            "What is prompt engineering? Explain with a funny real-life analogy"
+        ]
         with open(prompts_file, "w") as f:
             f.write("\n".join(default_prompts))
 
@@ -112,11 +74,11 @@ def get_next_prompt():
 
     return prompt
 
-# --- Step 4: Generate Post Content ---
+# Step 4: Generate Post Content 
 def generate_post_content(prompt):
     print("Generating post content from Gemini API...")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
-    payload = {"contents": [{"parts": [{"text": f'write the title of this content on the top in bold and italics and then write the content in maximum 100 words{prompt}'}]}]}
+    payload = {"contents": [{"parts": [{"text": f'Max 200 words with bold title of the content on top.\n{prompt} '}]}]}
     headers = {"Content-Type": "application/json"}
     
     try:
@@ -124,16 +86,16 @@ def generate_post_content(prompt):
         response.raise_for_status()
         data = response.json()
         post_text = data['candidates'][0]['content']['parts'][0]['text']
-        print("Content generated successfully.")
+        print("✅ Content generated successfully.")
         return post_text
     except requests.exceptions.RequestException as e:
-        print(f"Error generating content from Gemini: {e}")
+        print(f"❌ Error generating content from Gemini: {e}")
         return None
 
-# --- Step 5: Generate Image ---
+# Step 5: Generate Image
 def generate_image(prompt_text, day):
     print("Generating image from Hugging Face API...")
-    image_prompt = f"Create a digital art, futuristic illustration to post: {prompt_text}"
+    image_prompt = f"Create a futuristic digital art illustration for a Facebook AI post: {prompt_text}"
     
     HF_MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0"
     HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL_ID}"
@@ -148,13 +110,13 @@ def generate_image(prompt_text, day):
         image_filename = f"images/generated_image{day}.jpg"
         with open(image_filename, "wb") as f:
             f.write(response.content)
-        print(f"Image saved successfully as {image_filename}")
+        print(f"✅ Image saved successfully as {image_filename}")
         return image_filename
     except requests.exceptions.RequestException as e:
-        print(f"Error generating image: {e}")
+        print(f"❌ Error generating image: {e}")
         return None
 
-# --- Step 6: Post to Facebook ---
+# Step 6: Post to Facebook 
 def post_to_facebook(message, image_path):
     print("Posting content to Facebook...")
     url = f"https://graph.facebook.com/v19.0/{page_id}/photos"
@@ -168,10 +130,10 @@ def post_to_facebook(message, image_path):
         print("Post successful! Check your page.")
         return True
     except Exception as e:
-        print(f"Error posting to Facebook: {e}")
+        print(f"❌ Error posting to Facebook: {e}")
         return False
 
-# --- Step 7: Full automation ---
+#  Step 7: Full automation 
 def automatic_post():
     prompt = get_next_prompt()  # Different prompt each day
     post_message = generate_post_content(prompt)
@@ -180,14 +142,12 @@ def automatic_post():
         image_file_path = generate_image(post_message, day)
         if image_file_path:
             post_to_facebook(post_message, image_file_path)
-            print("Automation completed.\n")
+            print("✅ Automation completed.\n")
         else:
-            print("Image generation failed.")
+            print("❌ Image generation failed.")
     else:
-        print("Content generation failed.")
+        print("❌ Content generation failed.")
 
-# --- Main Scheduler ---
+# Main 
 if __name__ == "__main__":
-    schedule.every().day.at("17:06").do(automatic_post)
-    while True:
-        schedule.run_pending()
+    automatic_post()

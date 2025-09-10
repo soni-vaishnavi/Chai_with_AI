@@ -18,8 +18,6 @@ Thanks to **GitHub Actions**, the script runs daily in the cloud, so you don’t
 ```bash
 Chai_with_AI/
 │── main.py              # Main automation script
-│── main2.py             # Backup/testing script
-│── learning.ipynb       # Notes/experiments (ignored by Git)
 │── .env                 # Local API keys (not pushed to GitHub)
 │── .gitignore           # Defines ignored files
 │── images/              # Folder for generated images

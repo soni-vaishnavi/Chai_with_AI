@@ -30,7 +30,7 @@ Chai_with_AI/
 
 ✅ Example Run
 
-At 9 AM UTC every day, GitHub Actions starts the workflow.
+At 11 AM IST every day, GitHub Actions starts the workflow.
 
 It runs main.py.
 
